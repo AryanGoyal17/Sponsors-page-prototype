@@ -5,20 +5,19 @@ import "./SponsorOrbCanvas.css";
 
 const NODE_RADIUS = 2.6;
 const BASE_NODE_SCALE = 0.55;
-const HOVER_NODE_SCALE = 0.85; // Slightly larger for focus
+const HOVER_NODE_SCALE = 0.85; 
 const NODE_SCALE_LERP = 0.18;
 const ENTRANCE_DURATION = 1.2;
 
 function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
 function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
-// Modified: Places nodes in a perfect circle around the equator
 function equatorialPoint(i, count, radius) {
   const theta = (i / count) * Math.PI * 2;
   return new THREE.Vector3(
     radius * Math.sin(theta), 
     0,                        
-    radius * Math.cos(theta)  // Node 0 starts directly in front (Z)
+    radius * Math.cos(theta)  
   );
 }
 
@@ -38,8 +37,15 @@ function paintNodeFace(ctx, size, sponsor, img) {
   ctx.beginPath(); ctx.arc(c, c, c - 4, 0, Math.PI * 2); ctx.stroke();
 
   if (img) {
-    const logoSize = size * 0.6; // Enlarged slightly for better readability
+    const logoSize = size * 0.6; 
     ctx.drawImage(img, c - logoSize / 2, c - logoSize / 2, logoSize, logoSize);
+  } else {
+    ctx.fillStyle = "rgba(159, 243, 255, 0.9)";
+    ctx.font = `700 ${size * 0.22}px system-ui, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const initials = (sponsor.name || "").split(" ").slice(0, 2).map(w => w[0]?.toUpperCase()).join("");
+    ctx.fillText(initials, c, c + 2);
   }
 }
 
@@ -81,6 +87,9 @@ export default function SponsorOrbCanvas({ sponsors, onHoverFrame, scrollRotatio
     const container = canvas.parentElement ?? canvas;
     let w = container.clientWidth || 1;
     let h = container.clientHeight || 1;
+    
+    // Dynamic scale modifier: shrinks the orb by 35% on mobile devices
+    let mobileScaleModifier = w < 768 ? 0.65 : 1; 
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(55, w / h, 0.1, 100);
@@ -157,7 +166,12 @@ export default function SponsorOrbCanvas({ sponsors, onHoverFrame, scrollRotatio
     const resize = () => {
       w = container.clientWidth; h = container.clientHeight;
       if (!w || !h) return;
-      camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
+      camera.aspect = w / h; 
+      camera.updateProjectionMatrix(); 
+      renderer.setSize(w, h);
+      
+      // Update mobile scale modifier on resize
+      mobileScaleModifier = w < 768 ? 0.65 : 1;
     };
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
@@ -170,19 +184,18 @@ export default function SponsorOrbCanvas({ sponsors, onHoverFrame, scrollRotatio
       const t = clock.getElapsedTime();
       const entranceT = easeOutCubic(clamp(t / ENTRANCE_DURATION, 0, 1));
 
-      // 1. Strict Scroll Rotation (Overriding Drag/Inertia)
+      // 1. Strict Scroll Rotation
       if (scrollRotationRef) {
-        // We rotate nodeGroup explicitly so it perfectly aligns with the view
         nodeGroup.rotation.y = scrollRotationRef.current.current;
       }
 
-      // 2. Ambient background rotations (keeps it alive while paused)
+      // 2. Ambient background rotations
       points.rotation.y = -t * 0.05;
       wire1.rotation.y = t * 0.04;
       wire2.rotation.x = t * 0.03;
       core.scale.setScalar(1 + Math.sin(t * 1.6) * 0.04);
 
-      // 3. Auto-Focus Logic (Find the closest node facing the camera)
+      // 3. Auto-Focus Logic (Find closest node)
       let maxZ = -Infinity;
       let frontNode = null;
 
@@ -195,7 +208,7 @@ export default function SponsorOrbCanvas({ sponsors, onHoverFrame, scrollRotatio
         n.userData.targetScale = BASE_NODE_SCALE;
       });
 
-      // Show tooltip automatically if a node rests securely at the front
+      // Show tooltip automatically for front node (makes mobile tap easy)
       if (frontNode) {
         frontNode.userData.targetScale = HOVER_NODE_SCALE;
         const screen = projectToScreen(frontNode);
@@ -208,8 +221,10 @@ export default function SponsorOrbCanvas({ sponsors, onHoverFrame, scrollRotatio
         n.scale.y = n.scale.x;
       });
 
+      // Apply Base Scale + Mobile Size modifier
+      group.scale.setScalar(mobileScaleModifier * (0.6 + 0.4 * entranceT));
+      
       // Entrance Animations
-      group.scale.setScalar(0.6 + 0.4 * entranceT);
       wire1.material.opacity = 0.55 * entranceT;
       wire2.material.opacity = 0.25 * entranceT;
       points.material.opacity = 0.85 * entranceT;

@@ -12,7 +12,6 @@ gsap.registerPlugin(ScrollTrigger);
 export default function SponsorsOrbPage() {
   const [activeSponsor, setActiveSponsor] = useState(null);
   
-  // We now reference the stage directly, no more track container
   const stageRef = useRef(null); 
   const tooltipRef = useRef(null);
   const tooltipLabelRef = useRef(null);
@@ -23,14 +22,14 @@ export default function SponsorsOrbPage() {
   useEffect(() => {
     const numSponsors = sponsorsData.length;
     
-    // 1. Let GSAP perfectly pin the stage and calculate the scroll distance automatically
+    // Pin the stage and scrub the rotation based on scroll depth
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: stageRef.current, // Target the 100vh element
+        trigger: stageRef.current,
         start: "top top",
-        end: `+=${numSponsors * 150}%`, // Scroll for X times the viewport height
-        scrub: 1.5,
-        pin: true, // GSAP will automatically wrap this and lock it perfectly centered
+        end: `+=${numSponsors * 120}%`, // Scroll distance (120% per sponsor)
+        scrub: 1.2,
+        pin: true,
         snap: {
           snapTo: "labels",
           duration: { min: 0.3, max: 0.8 },
@@ -42,19 +41,21 @@ export default function SponsorsOrbPage() {
 
     const stepAngle = (Math.PI * 2) / numSponsors;
 
-    // 2. Build the precise Pause & Move timeline
+    // Build the pause-and-snap rotation timeline
     for (let i = 0; i < numSponsors; i++) {
       const currentAngle = -(stepAngle * i);
       const nextAngle = -(stepAngle * (i + 1));
 
       tl.addLabel(`sponsor-${i}`);
 
+      // Pause on the current sponsor
       tl.to(scrollRotationRef.current, { 
         current: currentAngle, 
         duration: 2, 
         ease: "none" 
       });
 
+      // Rotate to the next sponsor
       tl.to(scrollRotationRef.current, { 
         current: nextAngle, 
         duration: 1, 
@@ -67,6 +68,7 @@ export default function SponsorsOrbPage() {
     };
   }, []);
 
+  // Update tooltip position and content dynamically (works for mobile auto-focus too)
   const handleHoverFrame = (info) => {
     const el = tooltipRef.current;
     if (!el) return;
@@ -80,14 +82,17 @@ export default function SponsorsOrbPage() {
 
     hoveredSponsorRef.current = info.sponsor;
     el.style.opacity = "1";
-    el.style.pointerEvents = "auto";
-    el.style.transform = `translate3d(${info.x}px, ${info.y}px, 0) translate(-50%, calc(-100% - 14px))`;
-    if (tooltipLabelRef.current) tooltipLabelRef.current.textContent = info.sponsor.name;
+    el.style.pointerEvents = "auto"; // Makes the view button clickable
+    
+    // Position the tooltip slightly above the node
+    el.style.transform = `translate3d(${info.x}px, ${info.y}px, 0) translate(-50%, calc(-100% - 20px))`;
+    
+    if (tooltipLabelRef.current) {
+      tooltipLabelRef.current.textContent = info.sponsor.name;
+    }
   };
 
   return (
-    // We completely removed the outer <div className="sponsor-scroll-track"> wrapper!
-    // The <section> is now the top-level element and the GSAP trigger.
     <section ref={stageRef} className="sponsor-orb-stage">
       <SponsorOrbCanvas
         sponsors={sponsorsData}
