@@ -1,0 +1,13 @@
+/* SponsorOrbCanvas.css
+   This canvas fills its parent container (see .sponsor-orb-stage in
+   SponsorsOrbPage.css) rather than the viewport — unlike the original
+   OrbCanvas.css, which pinned to `position: fixed` as a global background.
+   Cursor state (grab/grabbing/pointer) is set imperatively from the drag/
+   hover logic in SponsorOrbCanvas.jsx. */
+
+.sponsor-orb-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none; /* prevent mobile scroll from hijacking drag gestures */
+}

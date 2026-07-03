@@ -1,0 +1,29 @@
+/* SponsorsOrbPage.css */
+
+.sponsor-orb-stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: #05070f;
+  overflow: hidden;
+}
+
+.sponsor-orb-tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(127, 233, 255, 0.3);
+  background: rgba(10, 14, 26, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #e8ecf5;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  pointer-events: none; /* never blocks canvas drag/click */
+  transition: opacity 0.15s ease;
+  will-change: transform, opacity;
+}

@@ -1,0 +1,84 @@
+/* SponsorModal.css */
+
+.sponsor-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 5, 10, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.sponsor-modal-panel {
+  position: relative;
+  width: min(380px, 90vw);
+  padding: 32px 28px;
+  border-radius: 20px;
+  border: 1px solid rgba(127, 233, 255, 0.28);
+  background: rgba(12, 17, 30, 0.75);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow:
+    0 0 60px rgba(63, 227, 255, 0.18),
+    0 0 120px rgba(59, 130, 246, 0.12);
+  color: #e8ecf5;
+  text-align: center;
+}
+
+.sponsor-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(127, 233, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  color: #e8ecf5;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.sponsor-modal-close:hover {
+  border-color: rgba(127, 233, 255, 0.6);
+  background: rgba(127, 233, 255, 0.08);
+}
+
+.sponsor-modal-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  margin: 4px auto 18px;
+}
+
+.sponsor-modal-panel h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.sponsor-modal-panel p {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+.sponsor-modal-link {
+  display: inline-block;
+  font-size: 13px;
+  color: #7fe9ff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(127, 233, 255, 0.4);
+  padding-bottom: 2px;
+}
+
+.sponsor-modal-link:hover {
+  color: #ffffff;
+  border-color: #ffffff;
+}
