@@ -1,7 +1,16 @@
 /* SponsorsOrbPage.css */
 
-.sponsor-orb-stage {
+/* Scroll track: gives the page real scroll distance to drive rotation.
+   Tune SCROLL_ROTATIONS in SponsorsOrbPage.jsx alongside this height —
+   taller track = slower rotation per pixel scrolled. */
+.sponsor-scroll-track {
   position: relative;
+  height: 350vh;
+}
+
+.sponsor-orb-stage {
+  position: sticky;
+  top: 0;
   width: 100%;
   height: 100vh;
   background: #05070f;
@@ -12,8 +21,11 @@
   position: absolute;
   top: 0;
   left: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   opacity: 0;
-  padding: 6px 12px;
+  padding: 6px 8px 6px 14px;
   border-radius: 999px;
   border: 1px solid rgba(127, 233, 255, 0.3);
   background: rgba(10, 14, 26, 0.75);
@@ -23,7 +35,33 @@
   font-size: 12px;
   letter-spacing: 0.03em;
   white-space: nowrap;
-  pointer-events: none; /* never blocks canvas drag/click */
+  /* Starts non-interactive so it never blocks canvas drag/click; flipped
+     to 'auto' imperatively (in handleHoverFrame) only while a node is
+     actively hovered, so the View button becomes clickable right then. */
+  pointer-events: none;
   transition: opacity 0.15s ease;
   will-change: transform, opacity;
+  z-index: 5;
+}
+
+.sponsor-orb-tooltip-name {
+  pointer-events: none;
+}
+
+.sponsor-orb-tooltip-view {
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #05070f;
+  background: #9ff3ff;
+  border: none;
+  border-radius: 999px;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.sponsor-orb-tooltip-view:hover {
+  background: #ffffff;
+  transform: scale(1.05);
 }

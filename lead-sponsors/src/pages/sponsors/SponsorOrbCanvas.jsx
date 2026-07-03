@@ -28,10 +28,19 @@
 //   sponsors        — [{ id, name, logoUrl, blurb, link }], read once at
 //                      mount (see note below — this assumes a static list).
 //   onSelectSponsor  — (sponsor) => void, fired on a confirmed click (not a drag)
-//   onHoverFrame     — ({ id, name, x, y } | null) => void, fired every frame
-//                      while a node is hovered, and once with null on hover-out
+//   onHoverFrame     — ({ sponsor, x, y } | null) => void, fired every frame
+//                      while a node is hovered, and once with null on hover-out.
+//                      Passes the full sponsor record (not just id/name) so the
+//                      page can wire a "View" button straight to onSelectSponsor
+//                      without a second lookup.
 //   verticalOffset   — number, matches the original file's `group.position.y`
 //                      convention (e.g. pass -1 to match the Home hero). Default 0.
+//   scrollRotationRef — optional ref<number>, radians. The page updates
+//                      `.current` (e.g. from a GSAP ScrollTrigger onUpdate)
+//                      and this component applies the *delta* to group.rotation.y
+//                      every frame, on top of drag/inertia/ambient rotation —
+//                      same additive model, just a third input into the same
+//                      accumulator, so it composes for free.
 // -----------------------------------------------------------------------------
 
 import { useEffect, useRef } from "react";
@@ -151,6 +160,7 @@ export default function SponsorOrbCanvas({
   onSelectSponsor,
   onHoverFrame,
   verticalOffset = 0,
+  scrollRotationRef,
 }) {
   const canvasRef = useRef(null);
 
@@ -377,6 +387,7 @@ export default function SponsorOrbCanvas({
     // --- Animation loop -----------------------------------------------
     const clock = new THREE.Clock();
     let lastElapsed = 0;
+    let lastScrollRotation = 0;
     let frameId;
 
     function animate() {
@@ -386,6 +397,19 @@ export default function SponsorOrbCanvas({
       lastElapsed = t;
 
       const entranceT = easeOutCubic(clamp(t / ENTRANCE_DURATION, 0, 1));
+
+      // Scroll-linked rotation: scrollRotationRef.current is an absolute
+      // target angle driven by scroll progress (see SponsorsOrbPage's
+      // ScrollTrigger), not a delta. We diff against the last frame's value
+      // and add just that delta to group.rotation.y, so it composes with
+      // drag/inertia/ambient spin on the same accumulator instead of
+      // fighting them — scroll up and the orb un-rotates by exactly as
+      // much as it rotated on the way down.
+      if (scrollRotationRef) {
+        const currentScrollRotation = scrollRotationRef.current ?? 0;
+        group.rotation.y += currentScrollRotation - lastScrollRotation;
+        lastScrollRotation = currentScrollRotation;
+      }
 
       if (!isDragging) {
         velocityY *= INERTIA_DAMPING;
@@ -428,7 +452,7 @@ export default function SponsorOrbCanvas({
         const node = nodes.find((n) => n.userData.sponsor.id === hoveredSponsor.id);
         if (node) {
           const screen = projectToScreen(node);
-          onHoverFrameRef.current?.({ id: hoveredSponsor.id, name: hoveredSponsor.name, ...screen });
+          onHoverFrameRef.current?.({ sponsor: hoveredSponsor, ...screen });
         }
       }
 

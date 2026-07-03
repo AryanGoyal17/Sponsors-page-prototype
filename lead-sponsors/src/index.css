@@ -1,0 +1,30 @@
+/* index.css — global reset
+   The white border around the page was just the browser's default `body`
+   margin (8px) plus no explicit background, so the white document canvas
+   showed through on every edge. `.sponsor-orb-stage` already fills 100vh,
+   this reset just removes what was fighting it. */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  background: #05070f;
+  color: #e8ecf5;
+  /* Vertical scroll stays ON — the scroll-linked orb rotation (see
+     SponsorsOrbPage) depends on real page scroll distance. Only the
+     horizontal axis is clamped, to kill any sub-pixel overflow sliver. */
+  overflow-x: hidden;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+#root {
+  min-height: 100%;
+}
