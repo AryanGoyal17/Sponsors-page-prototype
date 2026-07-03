@@ -1,13 +1,4 @@
 // SponsorModal.jsx
-// -----------------------------------------------------------------------------
-// Glassmorphism popup, animated with GSAP. Note the `displaySponsor` local
-// state: when the parent clears `sponsor` (closing the modal), we don't want
-// the content to vanish instantly while the backdrop is still fading out —
-// so this component keeps rendering the last sponsor until its own exit
-// tween finishes, then clears it. The parent's `sponsor` prop only controls
-// *when* to animate open/closed, not what's currently painted.
-// -----------------------------------------------------------------------------
-
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import "./SponsorModal.css";
@@ -16,39 +7,57 @@ export default function SponsorModal({ sponsor, onClose }) {
   const backdropRef = useRef(null);
   const panelRef = useRef(null);
   const [displaySponsor, setDisplaySponsor] = useState(null);
+  
   const isOpen = Boolean(sponsor);
+
+  // THE FIX: Derived State. 
+  // This forces React to render the panel into the DOM *before* the GSAP useEffect fires.
+  if (sponsor && sponsor !== displaySponsor) {
+    setDisplaySponsor(sponsor);
+  }
 
   useEffect(() => {
     const backdrop = backdropRef.current;
     const panel = panelRef.current;
+    
+    // Safety check
     if (!backdrop || !panel) return;
 
+    // Stop any animations currently happening
     gsap.killTweensOf([backdrop, panel]);
 
     if (isOpen) {
-      setDisplaySponsor(sponsor);
+      // 1. Unhide the backdrop
       gsap.set(backdrop, { display: "flex" });
-      gsap.fromTo(backdrop, { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" });
+      
+      // 2. Animate background blur in
+      gsap.fromTo(backdrop, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" });
+      
+      // 3. Animate the popup panel scaling up
       gsap.fromTo(
         panel,
-        { opacity: 0, scale: 0.92, y: 16 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "back.out(1.6)" }
+        { opacity: 0, scale: 0.9, y: 20 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "back.out(1.5)" }
       );
     } else if (displaySponsor) {
-      gsap.to(panel, { opacity: 0, scale: 0.92, y: 16, duration: 0.25, ease: "power2.in" });
+      // Animate the panel closing
+      gsap.to(panel, { opacity: 0, scale: 0.9, y: 20, duration: 0.2, ease: "power2.in" });
+      
+      // Fade out background and remove from DOM
       gsap.to(backdrop, {
         opacity: 0,
-        duration: 0.25,
+        duration: 0.2,
         ease: "power2.in",
         onComplete: () => {
           gsap.set(backdrop, { display: "none" });
+          // Clear the data only AFTER it finishes fading out
           setDisplaySponsor(null);
         },
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, displaySponsor]);
 
+  // Allow closing the popup by pressing the Escape key
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e) => e.key === "Escape" && onClose();
@@ -56,7 +65,7 @@ export default function SponsorModal({ sponsor, onClose }) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [isOpen, onClose]);
 
-  // Kill any in-flight tweens if the whole modal unmounts mid-animation.
+  // Clean up animations if component unmounts
   useEffect(() => {
     return () => gsap.killTweensOf([backdropRef.current, panelRef.current]);
   }, []);
@@ -68,19 +77,20 @@ export default function SponsorModal({ sponsor, onClose }) {
       style={{ display: "none" }}
       onClick={(e) => e.target === backdropRef.current && onClose()}
     >
+      {/* displaySponsor is now guaranteed to be ready, meaning panelRef exists for GSAP */}
       {displaySponsor && (
         <div ref={panelRef} className="sponsor-modal-panel">
           <button type="button" className="sponsor-modal-close" onClick={onClose} aria-label="Close">
-            ×
+            ✕
           </button>
-          <img src={displaySponsor.logoUrl} alt={displaySponsor.name} className="sponsor-modal-logo" />
-          <h3>{displaySponsor.name}</h3>
-          <p>{displaySponsor.blurb}</p>
-          {displaySponsor.link && (
-            <a href={displaySponsor.link} target="_blank" rel="noreferrer" className="sponsor-modal-link">
-              Visit site →
-            </a>
-          )}
+          
+          <div className="sponsor-modal-logo-container">
+            {displaySponsor.logoUrl ? (
+              <img src={displaySponsor.logoUrl} alt={displaySponsor.name} className="sponsor-modal-img" />
+            ) : (
+              <span className="sponsor-modal-placeholder">{displaySponsor.name}</span>
+            )}
+          </div>
         </div>
       )}
     </div>
