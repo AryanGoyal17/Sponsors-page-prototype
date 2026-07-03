@@ -1,45 +1,87 @@
 // sponsors.js
 export const sponsorsData = [
   { 
-    id: "google", 
-    name: "Google", 
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg", 
-    blurb: "Title Sponsor", 
-    link: "https://google.com" 
+    id: "immersive-gamebox", 
+    name: "Immersive Gamebox", 
+    logoUrl: null, // e.g., "/logos/immersive-gamebox.png"
+    blurb: "Entertainment Partner", 
+    link: "#" 
   },
   { 
-    id: "devfolio", 
-    name: "Devfolio", 
-    logoUrl: "https://lead-tiet.netlify.app/static/media/devfolio.bb650f9f.png", 
-    blurb: "Platform Partner", 
-    link: "https://devfolio.co" 
-  },
-  { 
-    id: "polygon", 
-    name: "Polygon", 
-    logoUrl: "https://lead-tiet.netlify.app/static/media/polygon.c157f44d.png", 
-    blurb: "Web3 Partner", 
-    link: "https://polygon.technology" 
-  },
-  { 
-    id: "codingninjas", 
+    id: "coding-ninjas", 
     name: "Coding Ninjas", 
-    logoUrl: "https://lead-tiet.netlify.app/static/media/codingNinjas.4c0e2ec3.png", 
+    logoUrl: null, // e.g., "/logos/coding-ninjas.png"
     blurb: "Learning Partner", 
-    link: "https://codingninjas.com" 
+    link: "https://www.codingninjas.com/" 
   },
   { 
-    id: "wolfram", 
-    name: "Wolfram", 
-    logoUrl: "https://lead-tiet.netlify.app/static/media/wolfram.2a5e55cd.png", 
+    id: "pro-ultimate-gyms", 
+    name: "Pro Ultimate Gyms", 
+    logoUrl: null, 
+    blurb: "Fitness Partner", 
+    link: "#" 
+  },
+  { 
+    id: "tezos", 
+    name: "Tezos", 
+    logoUrl: null, 
+    blurb: "Web3 Partner", 
+    link: "https://tezos.com/" 
+  },
+  { 
+    id: "coding-blocks", 
+    name: "Coding Blocks", 
+    logoUrl: null, 
+    blurb: "Education Partner", 
+    link: "https://codingblocks.com/" 
+  },
+  { 
+    id: "geeks-for-geeks", 
+    name: "Geeks For Geeks", 
+    logoUrl: null, 
     blurb: "Tech Partner", 
-    link: "https://wolfram.com" 
+    link: "https://www.geeksforgeeks.org/" 
   },
   { 
-    id: "postman", 
-    name: "Postman", 
-    logoUrl: "https://lead-tiet.netlify.app/static/media/postman.1633513f.png", 
-    blurb: "API Partner", 
-    link: "https://postman.com" 
+    id: "refections", 
+    name: "Refections", 
+    logoUrl: null, 
+    blurb: "Sponsor", 
+    link: "#" 
   },
+  { 
+    id: "da-ameeri", 
+    name: "Da Ameeri", 
+    logoUrl: null, 
+    blurb: "Hospitality Partner", 
+    link: "#" 
+  },
+  { 
+    id: "chai-sutta-bar", 
+    name: "Chai Sutta Bar", 
+    logoUrl: null, 
+    blurb: "Beverage Partner", 
+    link: "https://chaisuttabarindia.com/" 
+  },
+  { 
+    id: "interview-buddy", 
+    name: "Interview Buddy", 
+    logoUrl: null, 
+    blurb: "Career Partner", 
+    link: "https://interviewbuddy.in/" 
+  },
+  { 
+    id: "boston-co", 
+    name: "Boston & Co", 
+    logoUrl: null, 
+    blurb: "Food Partner", 
+    link: "#" 
+  },
+  { 
+    id: "land-of-grills", 
+    name: "Land of Grills", 
+    logoUrl: null, 
+    blurb: "Food Partner", 
+    link: "#" 
+  }
 ];
