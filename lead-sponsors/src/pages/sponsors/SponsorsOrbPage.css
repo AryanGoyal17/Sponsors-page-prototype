@@ -1,16 +1,12 @@
 /* SponsorsOrbPage.css */
 
-/* Scroll track: gives the page real scroll distance to drive rotation.
-   Tune SCROLL_ROTATIONS in SponsorsOrbPage.jsx alongside this height —
-   taller track = slower rotation per pixel scrolled. */
 .sponsor-scroll-track {
   position: relative;
-  height: 350vh;
+  /* Height is dynamically set in JSX based on sponsor count */
 }
 
 .sponsor-orb-stage {
-  position: sticky;
-  top: 0;
+  /* Removed position: sticky and top: 0 - GSAP pin: true handles this safely now */
   width: 100%;
   height: 100vh;
   background: #05070f;
@@ -35,9 +31,6 @@
   font-size: 12px;
   letter-spacing: 0.03em;
   white-space: nowrap;
-  /* Starts non-interactive so it never blocks canvas drag/click; flipped
-     to 'auto' imperatively (in handleHoverFrame) only while a node is
-     actively hovered, so the View button becomes clickable right then. */
   pointer-events: none;
   transition: opacity 0.15s ease;
   will-change: transform, opacity;
