@@ -1,12 +1,68 @@
 /* SponsorsOrbPage.css */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+
+.sponsor-scroll-track {
+  position: relative;
+  /* Increased from 350vh to 450vh to give plenty of room for the intro fade */
+  height: 450vh; 
+}
 
 .sponsor-orb-stage {
   width: 100%;
-  height: 100dvh; /* Uses dynamic viewport height for mobile browsers */
+  height: 100vh;
   background: #05070f;
   overflow: hidden;
   position: relative;
 }
+
+/* --- NEW: CINEMATIC INTRO STYLES --- */
+.canvas-blur-wrapper {
+  width: 100%;
+  height: 100%;
+  /* Initial state: heavy blur and darkened */
+  filter: blur(12px) brightness(0.4); 
+  will-change: filter;
+}
+
+.sponsor-hero {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+  color: white;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  pointer-events: none; /* Allows mouse interactions to pass through to the canvas */
+  width: 90%;
+  max-width: 800px;
+}
+
+.sponsor-hero-subtitle {
+  font-size: clamp(12px, 2vw, 14px);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #9ff3ff;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.sponsor-hero-title {
+  font-size: clamp(40px, 8vw, 90px);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+.sponsor-hero-desc {
+  font-size: clamp(16px, 3vw, 20px);
+  color: #a0a5b5;
+  margin-top: 24px;
+  font-weight: 400;
+}
+/* ----------------------------------- */
 
 .sponsor-orb-tooltip {
   position: absolute;
@@ -23,7 +79,7 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: #e8ecf5;
-  font-size: 14px; /* Slightly larger for easier mobile tapping */
+  font-size: 12px;
   letter-spacing: 0.03em;
   white-space: nowrap;
   pointer-events: none;
@@ -34,7 +90,6 @@
 
 .sponsor-orb-tooltip-name {
   pointer-events: none;
-  font-weight: 500;
 }
 
 .sponsor-orb-tooltip-view {
@@ -45,13 +100,12 @@
   background: #9ff3ff;
   border: none;
   border-radius: 999px;
-  padding: 6px 16px;
+  padding: 5px 14px;
   cursor: pointer;
   transition: transform 0.15s ease, background 0.15s ease;
 }
 
-.sponsor-orb-tooltip-view:hover, 
-.sponsor-orb-tooltip-view:active {
+.sponsor-orb-tooltip-view:hover {
   background: #ffffff;
   transform: scale(1.05);
 }

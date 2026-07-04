@@ -9,66 +9,53 @@ import "./SponsorsOrbPage.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const SCROLL_ROTATIONS = 1.25;
+
 export default function SponsorsOrbPage() {
   const [activeSponsor, setActiveSponsor] = useState(null);
-  
-  const stageRef = useRef(null); 
+  const trackRef = useRef(null);
   const tooltipRef = useRef(null);
   const tooltipLabelRef = useRef(null);
-  
-  const scrollRotationRef = useRef({ current: 0 });
+  const scrollRotationRef = useRef(0);
   const hoveredSponsorRef = useRef(null);
 
   useEffect(() => {
-    const numSponsors = sponsorsData.length;
-    
-    // Pin the stage and scrub the rotation based on scroll depth
+    // We create a master timeline for the whole pinned section
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: stageRef.current,
+        trigger: trackRef.current,
         start: "top top",
-        end: `+=${numSponsors * 120}%`, // Scroll distance (120% per sponsor)
-        scrub: 1.2,
-        pin: true,
-        snap: {
-          snapTo: "labels",
-          duration: { min: 0.3, max: 0.8 },
-          delay: 0.1,
-          ease: "power1.inOut"
-        }
+        end: "bottom bottom",
+        scrub: 0.6, 
+        pin: ".sponsor-orb-stage",
+        onUpdate: (self) => {
+          // The orb continuously rotates throughout the entire scroll
+          scrollRotationRef.current = self.progress * Math.PI * 2 * SCROLL_ROTATIONS;
+        },
       }
     });
 
-    const stepAngle = (Math.PI * 2) / numSponsors;
-
-    // Build the pause-and-snap rotation timeline
-    for (let i = 0; i < numSponsors; i++) {
-      const currentAngle = -(stepAngle * i);
-      const nextAngle = -(stepAngle * (i + 1));
-
-      tl.addLabel(`sponsor-${i}`);
-
-      // Pause on the current sponsor
-      tl.to(scrollRotationRef.current, { 
-        current: currentAngle, 
-        duration: 2, 
-        ease: "none" 
-      });
-
-      // Rotate to the next sponsor
-      tl.to(scrollRotationRef.current, { 
-        current: nextAngle, 
-        duration: 1, 
-        ease: "power2.inOut" 
-      });
-    }
+    // PHASE 1: The first 15% of the scroll fades the text up and clears the blur
+    tl.to(".sponsor-hero", { 
+      opacity: 0, 
+      y: -100, // Slides up 100px while fading
+      duration: 0.15, 
+      ease: "power2.inOut" 
+    }, 0)
+    .to(".canvas-blur-wrapper", { 
+      filter: "blur(0px) brightness(1)", 
+      duration: 0.15, 
+      ease: "power2.inOut" 
+    }, 0)
+    // PHASE 2: Dummy tween to pad out the remaining 85% of the scroll distance for pure rotation
+    .to({}, { duration: 0.85 });
 
     return () => {
+      tl.kill();
       ScrollTrigger.getAll().forEach(t => t.kill());
     };
   }, []);
 
-  // Update tooltip position and content dynamically (works for mobile auto-focus too)
   const handleHoverFrame = (info) => {
     const el = tooltipRef.current;
     if (!el) return;
@@ -82,36 +69,50 @@ export default function SponsorsOrbPage() {
 
     hoveredSponsorRef.current = info.sponsor;
     el.style.opacity = "1";
-    el.style.pointerEvents = "auto"; // Makes the view button clickable
-    
-    // Position the tooltip slightly above the node
-    el.style.transform = `translate3d(${info.x}px, ${info.y}px, 0) translate(-50%, calc(-100% - 20px))`;
-    
-    if (tooltipLabelRef.current) {
-      tooltipLabelRef.current.textContent = info.sponsor.name;
-    }
+    el.style.pointerEvents = "auto";
+    el.style.transform = `translate3d(${info.x}px, ${info.y}px, 0) translate(-50%, calc(-100% - 14px))`;
+    if (tooltipLabelRef.current) tooltipLabelRef.current.textContent = info.sponsor.name;
+  };
+
+  const handleViewClick = () => {
+    if (hoveredSponsorRef.current) setActiveSponsor(hoveredSponsorRef.current);
   };
 
   return (
-    <section ref={stageRef} className="sponsor-orb-stage">
-      <SponsorOrbCanvas
-        sponsors={sponsorsData}
-        onHoverFrame={handleHoverFrame}
-        scrollRotationRef={scrollRotationRef}
-      />
+    <div ref={trackRef} className="sponsor-scroll-track">
+      <section className="sponsor-orb-stage">
+        
+        {/* NEW: The cinematic overlay text */}
+        <div className="sponsor-hero">
+          <h3 className="sponsor-hero-subtitle">LEARN • EMERGE • ASPIRE • DISCOVER</h3>
+          <h1 className="sponsor-hero-title">OUR NETWORK</h1>
+          <p className="sponsor-hero-desc">The incredible partners powering the future of LEAD.</p>
+        </div>
 
-      <div ref={tooltipRef} className="sponsor-orb-tooltip" aria-hidden="true">
-        <span ref={tooltipLabelRef} className="sponsor-orb-tooltip-name" />
-        <button
-          type="button"
-          className="sponsor-orb-tooltip-view"
-          onClick={() => setActiveSponsor(hoveredSponsorRef.current)}
-        >
-          View
-        </button>
-      </div>
+        {/* NEW: Wrapper that handles the initial blur and dimming */}
+        <div className="canvas-blur-wrapper">
+          <SponsorOrbCanvas
+            sponsors={sponsorsData}
+            onSelectSponsor={setActiveSponsor}
+            onHoverFrame={handleHoverFrame}
+            scrollRotationRef={scrollRotationRef}
+          />
+        </div>
 
-      <SponsorModal sponsor={activeSponsor} onClose={() => setActiveSponsor(null)} />
-    </section>
+        <div ref={tooltipRef} className="sponsor-orb-tooltip" aria-hidden="true">
+          <span ref={tooltipLabelRef} className="sponsor-orb-tooltip-name" />
+          <button
+            type="button"
+            className="sponsor-orb-tooltip-view"
+            onClick={handleViewClick}
+            tabIndex={-1}
+          >
+            View
+          </button>
+        </div>
+
+        <SponsorModal sponsor={activeSponsor} onClose={() => setActiveSponsor(null)} />
+      </section>
+    </div>
   );
 }
