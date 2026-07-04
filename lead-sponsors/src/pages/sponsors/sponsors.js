@@ -1,87 +1,64 @@
 // sponsors.js
+
 export const sponsorsData = [
   { 
-    id: "immersive-gamebox", 
+    id: "gamebox", 
     name: "Immersive Gamebox", 
-    logoUrl: null, // e.g., "/logos/immersive-gamebox.png"
-    blurb: "Entertainment Partner", 
-    link: "#" 
+    logoUrl: "/logos/immersive-gamebox.png" 
   },
   { 
-    id: "coding-ninjas", 
+    id: "codingninjas", 
     name: "Coding Ninjas", 
-    logoUrl: null, // e.g., "/logos/coding-ninjas.png"
-    blurb: "Learning Partner", 
-    link: "https://www.codingninjas.com/" 
+    logoUrl: "/logos/coding-ninjas.png" 
   },
   { 
-    id: "pro-ultimate-gyms", 
+    id: "proultimategyms", 
     name: "Pro Ultimate Gyms", 
-    logoUrl: null, 
-    blurb: "Fitness Partner", 
-    link: "#" 
+    logoUrl: "/logos/pro-ultimate-gyms.png" 
   },
   { 
     id: "tezos", 
     name: "Tezos", 
-    logoUrl: null, 
-    blurb: "Web3 Partner", 
-    link: "https://tezos.com/" 
+    logoUrl: "/logos/tezos.png" 
   },
   { 
-    id: "coding-blocks", 
-    name: "Coding Blocks", 
-    logoUrl: null, 
-    blurb: "Education Partner", 
-    link: "https://codingblocks.com/" 
+    id: "codingblocks", 
+    name: "Online Coding Blocks", 
+    logoUrl: "/logos/online-coding-blocks.png" 
   },
   { 
-    id: "geeks-for-geeks", 
-    name: "Geeks For Geeks", 
-    logoUrl: null, 
-    blurb: "Tech Partner", 
-    link: "https://www.geeksforgeeks.org/" 
+    id: "gfg", 
+    name: "GeeksforGeeks", 
+    logoUrl: "/logos/geeksforgeeks.png" 
   },
   { 
     id: "refections", 
     name: "Refections", 
-    logoUrl: null, 
-    blurb: "Sponsor", 
-    link: "#" 
+    logoUrl: "/logos/refections.png" 
   },
   { 
-    id: "da-ameeri", 
+    id: "daameeri", 
     name: "Da Ameeri", 
-    logoUrl: null, 
-    blurb: "Hospitality Partner", 
-    link: "#" 
+    logoUrl: "/logos/da-ameeri.png" 
   },
   { 
-    id: "chai-sutta-bar", 
+    id: "chaisutta", 
     name: "Chai Sutta Bar", 
-    logoUrl: null, 
-    blurb: "Beverage Partner", 
-    link: "https://chaisuttabarindia.com/" 
+    logoUrl: "/logos/chai-sutta-bar.png" 
   },
   { 
-    id: "interview-buddy", 
+    id: "interviewbuddy", 
     name: "Interview Buddy", 
-    logoUrl: null, 
-    blurb: "Career Partner", 
-    link: "https://interviewbuddy.in/" 
+    logoUrl: "/logos/interview-buddy.png" 
   },
   { 
-    id: "boston-co", 
-    name: "Boston & Co", 
-    logoUrl: null, 
-    blurb: "Food Partner", 
-    link: "#" 
+    id: "landofgrill", 
+    name: "The Land of Grill", 
+    logoUrl: "/logos/land-of-grill.png" 
   },
   { 
-    id: "land-of-grills", 
-    name: "Land of Grills", 
-    logoUrl: null, 
-    blurb: "Food Partner", 
-    link: "#" 
-  }
+    id: "bostonco", 
+    name: "Boston & Co.", 
+    logoUrl: "/logos/boston-and-co.png" 
+  },
 ];
