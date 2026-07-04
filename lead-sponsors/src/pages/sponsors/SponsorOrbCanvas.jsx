@@ -4,9 +4,9 @@ import * as THREE from "three";
 import "./SponsorOrbCanvas.css";
 
 const NODE_RADIUS = 2.6;
-// INCREASED THESE SCALES TO MAKE CIRCLES MUCH BIGGER
-const BASE_NODE_SCALE = 0.85; 
-const HOVER_NODE_SCALE = 1.15;
+// Slightly toned down from 0.85 so they don't violently overlap on mobile
+const BASE_NODE_SCALE = 0.7; 
+const HOVER_NODE_SCALE = 1.05;
 const NODE_SCALE_LERP = 0.18;
 
 const DRAG_SENSITIVITY = 0.006;
@@ -56,12 +56,10 @@ function paintNodeFace(ctx, size, sponsor, img) {
   if (img) {
     ctx.save();
     ctx.beginPath();
-    // Widened the clip so the logo has more room
     ctx.arc(c, c, c - 4, 0, Math.PI * 2);
     ctx.clip();
 
     const imgAspect = img.width / img.height;
-    // Increased the logo draw scale from 0.7 to 0.85
     let drawWidth = size * 0.85; 
     let drawHeight = size * 0.85; 
 
@@ -123,8 +121,12 @@ export default function SponsorOrbCanvas({ sponsors, onSelectSponsor, onHoverFra
     const canvas = canvasRef.current;
     if (!canvas) return;
     const container = canvas.parentElement ?? canvas;
+    
     let w = container.clientWidth || 1;
     let h = container.clientHeight || 1;
+    
+    // NEW: Calculate initial responsive scale so it boots up perfectly on mobile
+    let responsiveScale = w < 800 ? w / 800 : 1;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(55, w / h, 0.1, 100);
@@ -214,6 +216,8 @@ export default function SponsorOrbCanvas({ sponsors, onSelectSponsor, onHoverFra
     let pointerId = null;
     let lastX = 0, lastY = 0, movedDistance = 0, velocityY = 0, velocityX = 0;
     let lastClientX = null, lastClientY = null;
+    let targetMouseX = 0, targetMouseY = 0;
+    let currentMouseX = 0, currentMouseY = 0;
     let hoveredSponsor = null;
 
     function updateHover(sponsor) {
@@ -231,6 +235,10 @@ export default function SponsorOrbCanvas({ sponsors, onSelectSponsor, onHoverFra
 
     const handlePointerMove = (event) => {
       lastClientX = event.clientX; lastClientY = event.clientY;
+      const rect = canvas.getBoundingClientRect();
+      targetMouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      targetMouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
       if (isDragging && event.pointerId === pointerId) {
         const dx = event.clientX - lastX, dy = event.clientY - lastY;
         lastX = event.clientX; lastY = event.clientY;
@@ -251,17 +259,31 @@ export default function SponsorOrbCanvas({ sponsors, onSelectSponsor, onHoverFra
       canvas.style.cursor = hoveredSponsor ? "pointer" : "grab";
     };
 
+    const handlePointerLeave = () => {
+      targetMouseX = 0;
+      targetMouseY = 0;
+      lastClientX = null;
+      lastClientY = null;
+      updateHover(null);
+    };
+
     canvas.addEventListener("pointerdown", handlePointerDown);
     canvas.addEventListener("pointermove", handlePointerMove);
     canvas.addEventListener("pointerup", handlePointerUp);
     canvas.addEventListener("pointercancel", handlePointerUp);
+    canvas.addEventListener("pointerleave", handlePointerLeave);
     canvas.style.touchAction = "pan-y";
     canvas.style.cursor = "grab";
 
     const resize = () => {
       w = container.clientWidth; h = container.clientHeight;
       if (!w || !h) return;
-      camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
+      camera.aspect = w / h; 
+      camera.updateProjectionMatrix(); 
+      renderer.setSize(w, h);
+
+      // NEW: Update responsive scaling modifier when screen size changes
+      responsiveScale = w < 800 ? w / 800 : 1;
     };
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
@@ -303,7 +325,14 @@ export default function SponsorOrbCanvas({ sponsors, onSelectSponsor, onHoverFra
         }
       }
 
-      points.rotation.y = -t * 0.05;
+      currentMouseX += (targetMouseX - currentMouseX) * 0.04;
+      currentMouseY += (targetMouseY - currentMouseY) * 0.04;
+
+      points.rotation.y = (-t * 0.05) + (currentMouseX * 0.3);
+      points.rotation.x = -(currentMouseY * 0.3);
+      points.position.x = currentMouseX * 0.5;
+      points.position.y = currentMouseY * 0.5;
+
       wire1.rotation.y = t * 0.04;
       wire2.rotation.x = t * 0.03;
       core.scale.setScalar(1 + Math.sin(t * 1.6) * 0.04);
@@ -313,7 +342,9 @@ export default function SponsorOrbCanvas({ sponsors, onSelectSponsor, onHoverFra
         n.scale.y = n.scale.x;
       });
 
-      group.scale.setScalar(0.6 + 0.4 * entranceT);
+      // NEW: Multiply the entrance scale by the responsive mobile scale!
+      group.scale.setScalar(responsiveScale * (0.6 + 0.4 * entranceT));
+
       wire1.material.opacity = 0.55 * entranceT;
       wire2.material.opacity = 0.25 * entranceT;
       points.material.opacity = 0.85 * entranceT;
@@ -335,8 +366,11 @@ export default function SponsorOrbCanvas({ sponsors, onSelectSponsor, onHoverFra
 
     return () => {
       cancelAnimationFrame(frameId); resizeObserver.disconnect();
-      canvas.removeEventListener("pointerdown", handlePointerDown); canvas.removeEventListener("pointermove", handlePointerMove);
-      canvas.removeEventListener("pointerup", handlePointerUp); canvas.removeEventListener("pointercancel", handlePointerUp);
+      canvas.removeEventListener("pointerdown", handlePointerDown); 
+      canvas.removeEventListener("pointermove", handlePointerMove);
+      canvas.removeEventListener("pointerup", handlePointerUp); 
+      canvas.removeEventListener("pointercancel", handlePointerUp);
+      canvas.removeEventListener("pointerleave", handlePointerLeave);
       renderer.dispose();
     };
   }, [verticalOffset]);
